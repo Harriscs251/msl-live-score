@@ -1,39 +1,51 @@
-# Use PHP official image
+# Use the official PHP image with necessary extensions
 FROM php:8.2-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    libzip-dev \
+    libpq-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    && docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
+
+# Install Composer
+COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
 
-# ✅ Install system packages and PHP extensions in ONE RUN block
-RUN apt-get update && \
-    apt-get install -y git curl libzip-dev unzip libpng-dev libonig-dev libxml2-dev libpq-dev && \
-    docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
-
-# ✅ Install Composer from official image
-COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
-
-# ✅ Copy only composer files first for caching
-COPY composer.json composer.lock ./
-
-# ✅ Copy .env.example as .env (needed for package discovery)
-COPY .env.example .env
-
-# ✅ Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# ✅ Copy the full Laravel project
+# Copy Laravel project files
 COPY . .
 
-# ✅ Copy and set permissions for entrypoint script
+# ✅ Ensure .env exists BEFORE Composer runs
+RUN cp .env.example .env
+
+# Install PHP dependencies
+RUN composer install --prefer-dist --optimize-autoloader --no-dev
+
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
+
+# Create necessary Laravel storage folders
+RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
+    && chown -R www-data:www-data /var/www/storage
+
+# Copy and enable entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# ✅ Set correct permissions for Laravel
-RUN chown -R www-data:www-data /var/www && \
-    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-# ✅ Expose Laravel port
+# Expose port
 EXPOSE 8000
 
-# ✅ Start Laravel via entrypoint script
-ENTRYPOINT ["/entrypoint.sh"]
+# Start Laravel via entrypoint
+CMD ["/entrypoint.sh"]

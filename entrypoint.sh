@@ -15,7 +15,7 @@ if ! grep -q "APP_KEY=base64" .env && [ -z "$APP_KEY" ]; then
   php artisan key:generate
 fi
 
-# Optional: Uncomment below to run migrations automatically
+# Optional: Run migrations automatically
 # echo "🛠️ Running database migrations..."
 # php artisan migrate --force
 
