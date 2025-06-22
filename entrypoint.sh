@@ -9,6 +9,9 @@ if [ ! -f .env ]; then
   envsubst < .env.example > .env
 fi
 
+echo "📄 Showing contents of .env (for debug):"
+cat .env
+
 echo "🔐 Checking APP_KEY..."
 if ! grep -q "^APP_KEY=base64" .env; then
   echo "⚠️ APP_KEY missing or invalid. Generating..."
@@ -18,7 +21,10 @@ else
 fi
 
 echo "🛠️ Running migrations..."
-php artisan migrate --force
+php artisan migrate --force || {
+  echo "❌ Migration failed. Check DB settings in .env or Render environment."
+  exit 1
+}
 
 echo "🚀 Starting Laravel server..."
-php artisan serve --host=0.0.0.0 --port=8000
+exec php artisan serve --host=0.0.0.0 --port=8000
