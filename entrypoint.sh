@@ -30,7 +30,7 @@ php artisan tinker --execute="
 if (!\\App\\Models\\User::where('email', 'harris@gmail.com')->exists()) {
     \\App\\Models\\User::create([
         'name' => 'Harris',
-        'email' => 'harris@gmail.com',
+        'email' => 'harrisnice32@gmail.com',
         'password' => bcrypt('12345678'),
         'is_admin' => 1,
         'points' => 0
