@@ -25,6 +25,22 @@ php artisan queue:table || true
 echo "📦 Running migrations..."
 php artisan migrate --force
 
+echo "👤 Creating admin user if not exists..."
+php artisan tinker --execute="
+if (!\\App\\Models\\User::where('email', 'harris@gmail.com')->exists()) {
+    \\App\\Models\\User::create([
+        'name' => 'Harris',
+        'email' => 'harris@gmail.com',
+        'password' => bcrypt('12345678'),
+        'is_admin' => 1,
+        'points' => 0
+    ]);
+    echo '✅ Admin user created.';
+} else {
+    echo 'ℹ️ Admin user already exists.';
+}
+"
+
 echo "🧹 Clearing Laravel cache..."
 php artisan config:clear
 php artisan cache:clear || true
