@@ -17,12 +17,9 @@ else
   echo "✅ APP_KEY is set."
 fi
 
-echo "🧹 Clearing Laravel config/cache..."
-php artisan config:clear
-php artisan cache:clear
-
-echo "🛠️ Running database migrations..."
-php artisan migrate --force || echo "⚠️ Migration warning handled. Proceeding."
+# Optional: Automatically run migrations
+# echo "🛠️ Running database migrations..."
+# php artisan migrate --force
 
 echo "🚀 Starting Laravel server..."
 php artisan serve --host=0.0.0.0 --port=8000
