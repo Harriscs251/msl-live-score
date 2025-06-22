@@ -10,12 +10,7 @@ if [ ! -f .env ]; then
   cp .env.example .env
 fi
 
-if [ ! -d vendor ]; then
-  echo "📦 Installing Composer dependencies..."
-  composer install --no-dev --optimize-autoloader
-fi
-
-if ! grep -q "APP_KEY=base64" .env; then
+if ! grep -q "APP_KEY=base64" .env && [ -z "$APP_KEY" ]; then
   echo "🔐 Generating application key..."
   php artisan key:generate
 fi
