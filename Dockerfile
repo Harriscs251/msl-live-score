@@ -4,11 +4,10 @@ FROM php:8.2-fpm
 # Set working directory
 WORKDIR /var/www
 
-# Install system packages and PHP extensions
-RUN apt-get update && apt-get install -y \
-    git curl libzip-dev unzip libpng-dev libonig-dev libxml2-dev \
-    libpq-dev \                             # ✅ Needed for PostgreSQL
-    && docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
+# ✅ Install system packages and PHP extensions in ONE RUN block
+RUN apt-get update && \
+    apt-get install -y git curl libzip-dev unzip libpng-dev libonig-dev libxml2-dev libpq-dev && \
+    docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
@@ -16,22 +15,22 @@ COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 # Copy only composer files first for caching
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies using Composer
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Copy the entire project
+# Copy the full Laravel project
 COPY . .
 
-# Copy and enable entrypoint script
+# Copy and set permissions for entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Set permissions for Laravel writable folders
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Set proper permissions for Laravel storage and cache
+RUN chown -R www-data:www-data /var/www && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Expose Laravel dev port
+# Expose Laravel port
 EXPOSE 8000
 
-# Use the custom entrypoint script
+# Start via entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
