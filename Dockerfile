@@ -1,26 +1,39 @@
-# Use PHP official image
+# Use official PHP image with required extensions
 FROM php:8.2-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    libzip-dev \
+    libpq-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    gettext \
+    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl
+
+# Install Composer from Composer's official image
+COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
 
-# Install system packages and PHP extensions
-RUN apt-get update && apt-get install -y \
-    git curl libzip-dev unzip libpng-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Copy all project files
+COPY . .
 
-# Install Composer
-COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
+# Set safe TMPDIR (Render sometimes fails with /tmp)
+ENV TMPDIR=/var/www/tmp
+RUN mkdir -p $TMPDIR
 
-# Copy the Laravel project into the container
-COPY . /var/www
+# Install Laravel dependencies correctly
+RUN composer install --optimize-autoloader --no-dev
 
-# Set permissions for Laravel directories
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-# Expose the port Laravel will run on
-EXPOSE 8000
-
-# Start Laravel server
-CMD php artisan serve --host=0.0.0.0 --port=8000
+# Set permissions for storage and cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod

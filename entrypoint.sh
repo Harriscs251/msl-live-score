@@ -9,6 +9,12 @@ if [ ! -f .env ]; then
   cp .env.example .env
 fi
 
+# Ensure vendor folder exists (especially if COPY . . skipped it)
+if [ ! -f vendor/autoload.php ]; then
+  echo "🚨 vendor/autoload.php not found. Running composer install..."
+  composer install --optimize-autoloader --no-dev
+fi
+
 echo "🔐 Verifying APP_KEY..."
 if ! grep -q "^APP_KEY=base64" .env; then
   echo "⚠ APP_KEY is missing or invalid. Generating..."
