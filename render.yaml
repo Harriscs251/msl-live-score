@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: laravel-docker-app
+    env: docker
+    plan: free
+    branch: main
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        value: # we'll generate later
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: dpg-d1bmcdur433s739n75jg-a
+      - key: DB_PORT
+        value: 5432
+      - key: DB_DATABASE
+        value: msl_db
+      - key: DB_USERNAME
+        value: ymsl_db_user
+      - key: DB_PASSWORD
+        value: YrO8U9FtryEf9RWBOrUm8VEZTEcKIdqY
