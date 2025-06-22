@@ -11,15 +11,19 @@ fi
 
 echo "🔐 Checking APP_KEY..."
 if ! grep -q "^APP_KEY=base64" .env; then
-  echo "⚠️ APP_KEY missing or invalid. Generating..."
-  php artisan key:generate
+  echo "⚠ APP_KEY missing or invalid. Generating..."
+  php artisan key:generate --force
 else
   echo "✅ APP_KEY is set."
 fi
 
-# Uncomment to run migrations if you want to auto-migrate:
-# echo "🛠️ Running database migrations..."
+echo "♻ Caching Laravel configuration..."
+php artisan config:clear
+php artisan config:cache
+
+# Uncomment the line below if you want automatic DB migrations on deploy
+# echo "🛠 Running database migrations..."
 # php artisan migrate --force
 
 echo "🚀 Starting Laravel server..."
-php artisan serve --host=0.0.0.0 --port=8000
+exec php artisan serve --host=0.0.0.0 --port=8000
