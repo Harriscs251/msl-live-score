@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libcurl4-openssl-dev \
     libssl-dev \
+    gettext \
     && docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
 
 # Install Composer
@@ -41,7 +42,7 @@ RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Expose port
+# Expose Laravel port
 EXPOSE 8000
 
 # Start Laravel via entrypoint

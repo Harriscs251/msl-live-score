@@ -3,21 +3,21 @@
 set -e
 cd /var/www
 
-echo "🔍 Checking for .env file..."
+echo "🔍 Preparing .env file..."
 if [ ! -f .env ]; then
-  echo "📄 .env not found. Copying from .env.example..."
-  cp .env.example .env
+  echo "📄 .env not found. Generating from .env.example using envsubst..."
+  envsubst < .env.example > .env
 fi
 
 echo "🔐 Checking APP_KEY..."
-if grep -q "^APP_KEY=${APP_KEY}" .env && [[ "$APP_KEY" != base64:* ]]; then
-  echo "⚠️ APP_KEY is missing or not valid base64. Generating one..."
+if ! grep -q "^APP_KEY=base64" .env; then
+  echo "⚠️ APP_KEY missing or invalid. Generating..."
   php artisan key:generate
 else
-  echo "✅ APP_KEY is present and valid."
+  echo "✅ APP_KEY is set."
 fi
 
-# Optional: Run migrations automatically
+# Optional: Automatically run migrations
 # echo "🛠️ Running database migrations..."
 # php artisan migrate --force
 
