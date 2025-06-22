@@ -1,28 +1,27 @@
 #!/bin/bash
 
-# Fail if anything errors
 set -e
 
 cd /var/www
 
-echo "🔍 Checking .env..."
+echo "🔍 Checking for .env file..."
 if [ ! -f .env ]; then
-  echo "📄 .env not found, copying from .env.example..."
+  echo "📄 .env not found. Copying from .env.example..."
   cp .env.example .env
 fi
 
 if [ ! -d vendor ]; then
-  echo "📦 Installing composer packages..."
+  echo "📦 Installing Composer dependencies..."
   composer install --no-dev --optimize-autoloader
 fi
 
 if ! grep -q "APP_KEY=base64" .env; then
-  echo "🔐 Generating app key..."
+  echo "🔐 Generating application key..."
   php artisan key:generate
 fi
 
-# Optional: Uncomment this if you want automatic migrations
-# echo "📂 Running migrations..."
+# Optional: Uncomment below to run migrations automatically
+# echo "🛠️ Running database migrations..."
 # php artisan migrate --force
 
 echo "🚀 Starting Laravel server..."
