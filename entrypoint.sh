@@ -1,27 +1,27 @@
 #!/bin/bash
 
-set -e
+set -e  # Exit immediately if any command fails
 cd /var/www
 
-echo "🔍 Preparing .env file..."
+echo "📄 Checking .env file..."
 if [ ! -f .env ]; then
-  echo "📄 .env not found. Generating from .env.example using envsubst..."
-  envsubst < .env.example > .env
+  echo "📄 .env not found. Copying from .env.example..."
+  cp .env.example .env
 fi
 
-echo "🔐 Checking APP_KEY..."
+echo "🔐 Verifying APP_KEY..."
 if ! grep -q "^APP_KEY=base64" .env; then
-  echo "⚠ APP_KEY missing or invalid. Generating..."
+  echo "⚠ APP_KEY is missing or invalid. Generating..."
   php artisan key:generate --force
 else
-  echo "✅ APP_KEY is set."
+  echo "✅ APP_KEY exists."
 fi
 
-echo "♻ Caching Laravel configuration..."
+echo "🧹 Clearing and caching Laravel config..."
 php artisan config:clear
 php artisan config:cache
 
-# Uncomment the line below if you want automatic DB migrations on deploy
+# Optional: Uncomment this if you want auto migration on each deploy
 # echo "🛠 Running database migrations..."
 # php artisan migrate --force
 
