@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-
 cd /var/www
 
 echo "🔍 Checking for .env file..."
@@ -11,11 +10,11 @@ if [ ! -f .env ]; then
 fi
 
 echo "🔐 Checking APP_KEY..."
-if ! grep -q "^APP_KEY=base64" .env && [ -z "$APP_KEY" ]; then
-  echo "📦 No APP_KEY found in .env or environment. Generating one..."
+if grep -q "^APP_KEY=${APP_KEY}" .env && [[ "$APP_KEY" != base64:* ]]; then
+  echo "⚠️ APP_KEY is missing or not valid base64. Generating one..."
   php artisan key:generate
 else
-  echo "✅ APP_KEY already exists."
+  echo "✅ APP_KEY is present and valid."
 fi
 
 # Optional: Run migrations automatically
