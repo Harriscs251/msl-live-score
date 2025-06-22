@@ -17,9 +17,11 @@ else
   echo "✅ APP_KEY is set."
 fi
 
-# Optional: Automatically run migrations
-# echo "🛠️ Running database migrations..."
-# php artisan migrate --force
+echo "🗂️ Generating sessions table migration if not exists..."
+php artisan session:table || true
+
+echo "🛠️ Running database migrations..."
+php artisan migrate --force
 
 echo "🚀 Starting Laravel server..."
 php artisan serve --host=0.0.0.0 --port=8000
