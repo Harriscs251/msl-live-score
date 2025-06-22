@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e  # Exit immediately if any command fails
+set -e
 cd /var/www
 
 echo "📄 Checking .env file..."
@@ -17,8 +17,13 @@ else
   echo "✅ APP_KEY exists."
 fi
 
-echo "🧹 Clearing and caching Laravel config..."
+echo "🧹 Clearing Laravel cache..."
 php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+
+echo "🧠 Caching fresh Laravel config..."
 php artisan config:cache
 
 echo "🛠 Running database migrations..."
