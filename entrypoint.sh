@@ -21,9 +21,8 @@ echo "🧹 Clearing and caching Laravel config..."
 php artisan config:clear
 php artisan config:cache
 
-# Optional: Uncomment this if you want auto migration on each deploy
-# echo "🛠 Running database migrations..."
-# php artisan migrate --force
+echo "🛠 Running database migrations..."
+php artisan migrate --force
 
 echo "🚀 Starting Laravel server..."
 exec php artisan serve --host=0.0.0.0 --port=8000
