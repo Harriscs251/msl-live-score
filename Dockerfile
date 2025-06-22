@@ -1,7 +1,7 @@
 # Use the official PHP image with necessary extensions
 FROM php:8.2-fpm
 
-# Install system dependencies
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -21,20 +21,23 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Set the working directory
 WORKDIR /var/www
 
-# Copy Laravel project files
+# Copy Laravel project files into the container
 COPY . .
 
-# Install PHP dependencies
+# Ensure .env exists (for composer post-install hooks)
+RUN cp .env.example .env
+
+# Install Laravel PHP dependencies
 RUN composer install --prefer-dist --optimize-autoloader --no-dev
 
-# Set correct permissions
+# Set proper permissions for Laravel writable directories
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
 
-# Create necessary Laravel storage folders
+# Create necessary Laravel storage subdirectories
 RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
     && chown -R www-data:www-data /var/www/storage
 
@@ -42,8 +45,8 @@ RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Expose Laravel port
+# Expose Laravel's internal PHP server port
 EXPOSE 8000
 
-# Start Laravel via entrypoint
+# Start Laravel using entrypoint
 CMD ["/entrypoint.sh"]

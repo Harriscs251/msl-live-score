@@ -17,7 +17,7 @@ else
   echo "✅ APP_KEY is set."
 fi
 
-# Optional: Automatically run migrations
+# Uncomment to run migrations if you want to auto-migrate:
 # echo "🛠️ Running database migrations..."
 # php artisan migrate --force
 
