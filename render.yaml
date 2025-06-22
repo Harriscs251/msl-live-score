@@ -21,6 +21,6 @@ services:
       - key: DB_DATABASE
         value: msl_db
       - key: DB_USERNAME
-        value: ymsl_db_user
+        value: msl_db_user
       - key: DB_PASSWORD
         value: YrO8U9FtryEf9RWBOrUm8VEZTEcKIdqY
