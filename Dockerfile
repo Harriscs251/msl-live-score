@@ -26,9 +26,6 @@ WORKDIR /var/www
 # Copy Laravel project files
 COPY . .
 
-# ✅ Ensure .env exists BEFORE Composer runs
-RUN cp .env.example .env
-
 # Install PHP dependencies
 RUN composer install --prefer-dist --optimize-autoloader --no-dev
 
