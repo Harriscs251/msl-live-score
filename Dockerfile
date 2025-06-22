@@ -1,53 +1,26 @@
-# Stage 1: Use official PHP image with required extensions
+# Use PHP official image
 FROM php:8.2-fpm
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    libzip-dev \
-    libpq-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    gettext \
-    && docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl
-
-# Install Composer from Composer's official image
-COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
 
-# Copy all files to container
-COPY . .
+# Install system packages and PHP extensions
+RUN apt-get update && apt-get install -y \
+    git curl libzip-dev unzip libpng-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Set safe TMPDIR (Render sometimes fails with /tmp)
-ENV TMPDIR=/var/www/tmp
-RUN mkdir -p $TMPDIR
+# Install Composer
+COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 
-# Install Laravel dependencies with optimized flags
-RUN composer install --prefer-dist --no-scripts --no-plugins --no-dev
+# Copy the Laravel project into the container
+COPY . /var/www
 
-# Ensure correct permissions for Laravel
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R ug+rwx /var/www/storage /var/www/bootstrap/cache
+# Set permissions for Laravel directories
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Create required Laravel storage framework directories
-RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
-    && chown -R www-data:www-data /var/www/storage
-
-# Copy and make the entrypoint script executable
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Expose Laravel’s PHP dev server port
+# Expose the port Laravel will run on
 EXPOSE 8000
 
-# Launch the app via entrypoint script
-CMD ["/entrypoint.sh"]
+# Start Laravel server
+CMD php artisan serve --host=0.0.0.0 --port=8000

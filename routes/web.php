@@ -64,7 +64,7 @@ Route::get('/statistics', [App\Http\Controllers\StatisticController::class, 'ind
 Route::get('/match-history', [App\Http\Controllers\StatisticController::class, 'matchHistory'])->name('matches.history');
 
 // =============================
-// ❤ FAVORITE TEAMS
+// ❤️ FAVORITE TEAMS
 // =============================
 Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index');
 Route::post('/favorites/toggle', [App\Http\Controllers\FavoriteController::class, 'toggleFavorite'])->name('favorites.toggle');
@@ -87,7 +87,7 @@ Route::prefix('forum')->name('forum.')->group(function () {
 });
 
 // =============================
-// 🛠 ADMIN FORUM MODERATION
+// 🛠️ ADMIN FORUM MODERATION
 // =============================
 Route::prefix('admin/forum')->name('admin.forum.')->group(function () {
     Route::get('/', [App\Http\Controllers\AdminForumController::class, 'index'])->name('index');
@@ -256,10 +256,3 @@ Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.e
 
 // Route for updating user profile (POST request)
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-
-// =============================
-// 🪵 LOG VIEW (DEV ONLY)
-// =============================
-Route::get('/log', function () {
-    return response()->file(storage_path('logs/laravel.log'));
-});
